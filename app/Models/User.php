@@ -45,4 +45,19 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+      /**
+     * Get the blog posts authored by the user.
+     */
+    public function blogPosts()
+    {
+        return $this->hasMany(BlogPost::class, 'author_id');
+    }
+
+    /**
+     * Get the proposals reviewed by the user.
+     */
+    public function reviewedProposals()
+    {
+        return $this->hasMany(Proposal::class, 'reviewed_by');
+    }
 }
