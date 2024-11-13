@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QnaController;
+use App\Http\Controllers\BlogPostController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -32,6 +33,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/qnas/{qna}/edit', [QnaController::class, 'edit'])->name('qnas.edit');
     Route::put('/qnas/{qna}', [QnaController::class, 'update'])->name('qnas.update');
     Route::delete('/qnas/{qna}', [QnaController::class, 'destroy'])->name('qnas.destroy');
+     // blog posts
+    Route::get('/blogposts', [BlogPostController::class, 'index'])->name('blogposts.index');
+    Route::get('/blogposts/create', [BlogPostController::class, 'create'])->name('blogposts.create');
+    Route::post('/blogposts', [BlogPostController::class, 'store'])->name('blogposts.store');
+    Route::get('/blogposts/{blogpost}', [BlogPostController::class, 'show'])->name('blogposts.show');
+    Route::get('/blogposts/{blogpost}/edit', [BlogPostController::class, 'edit'])->name('blogposts.edit');
+    Route::put('/blogposts/{blogpost}', [BlogPostController::class, 'update'])->name('blogposts.update');
+    Route::delete('/blogposts/{blogpost}', [BlogPostController::class, 'destroy'])->name('blogposts.destroy');
 });
 
 Route::resource('qnas', QnaController::class);
