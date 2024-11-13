@@ -5,6 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QnaController;
 use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\ProposalsController;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -41,7 +43,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/blogposts/{blogpost}/edit', [BlogPostController::class, 'edit'])->name('blogposts.edit');
     Route::put('/blogposts/{blogpost}', [BlogPostController::class, 'update'])->name('blogposts.update');
     Route::delete('/blogposts/{blogpost}', [BlogPostController::class, 'destroy'])->name('blogposts.destroy');
+    // proposals
+    Route::get('/proposals', [ProposalsController::class, 'index'])->name('proposals.index');
+    Route::get('/proposals/create', [ProposalsController::class, 'create'])->name('proposals.create');
+    Route::post('/proposals', [ProposalsController::class, 'store'])->name('proposals.store');
+    Route::get('/proposals/{proposal}', [ProposalsController::class, 'show'])->name('proposals.show');
+    Route::get('/proposals/{proposal}/edit', [ProposalsController::class, 'edit'])->name('proposals.edit');
+    Route::put('/proposals/{proposal}', [ProposalsController::class, 'update'])->name('proposals.update');
+    Route::delete('/proposals/{proposal}', [ProposalsController::class, 'destroy'])->name('proposals.destroy');
 });
+
+Route::get('/storage/app/private/{file}', function ($file) {
+    $filePath = $file;
+
+    if (!Storage::exists($filePath)) {
+        abort(404);
+    }
+
+    return Storage::download($filePath);
+})->name('proposals.download');
 
 Route::resource('qnas', QnaController::class);
 
