@@ -53,11 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/proposals/{proposal}', [ProposalsController::class, 'destroy'])->name('proposals.destroy');
 });
 
-Route::get('/storage/app/private/{file}', function ($file) {
-    $filePath = $file;
+Route::get('/proposals/download/{file}', function ($file) {
+    $filePath = 'proposals/' . $file;
 
     if (!Storage::exists($filePath)) {
-        abort(404);
+        abort(404, 'File not found.');
     }
 
     return Storage::download($filePath);

@@ -42,7 +42,7 @@ class ProposalsController extends Controller
 
         if ($request->hasFile('proposal_file')) {
             $filePath = $request->file('proposal_file')->store('proposals');
-            $validatedData['proposal_file'] = $filePath;
+            $validatedData['proposal_file'] = basename($filePath);
         }
 
         Proposal::create($validatedData);
