@@ -15,6 +15,7 @@ class BlogPost extends Model
         'title',
         'content',
         'author_id',
+        'banner_image',
     ];
 
     public function author()

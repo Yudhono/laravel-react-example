@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { router } from "@inertiajs/react";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import {
+    TextField,
+    Button,
+    Container,
+    Typography,
+    Box,
+    InputLabel,
+    Input,
+    FormControl,
+} from "@mui/material";
 import DashboardTemplate from "@/Components/DashboardTemplate";
 
 import Editor from "./Editor";
@@ -9,14 +18,25 @@ const Create = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [authorId, setAuthorId] = useState("");
+    const [bannerImage, setBannerImage] = useState(null);
+    const [bannerImagePreview, setBannerImagePreview] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        router.post(route("blogposts.store"), {
-            title,
-            content,
-            author_id: authorId,
-        });
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("author_id", authorId);
+        if (bannerImage) {
+            formData.append("banner_image", bannerImage);
+        }
+        router.post(route("blogposts.store"), formData);
+    };
+
+    const handleBannerImageChange = (e) => {
+        const file = e.target.files[0];
+        setBannerImage(file);
+        setBannerImagePreview(URL.createObjectURL(file));
     };
 
     return (
@@ -31,6 +51,30 @@ const Create = () => {
                     noValidate
                     sx={{ mt: 1 }}
                 >
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel htmlFor="banner-image">
+                            Banner Image
+                        </InputLabel>
+                        <Input
+                            id="banner-image"
+                            type="file"
+                            inputProps={{ accept: "image/*" }}
+                            onChange={handleBannerImageChange}
+                        />
+                    </FormControl>
+                    {bannerImagePreview && (
+                        <Box mt={2}>
+                            <img
+                                src={bannerImagePreview}
+                                alt="Banner Preview"
+                                style={{
+                                    width: "100%",
+                                    maxHeight: "300px",
+                                    objectFit: "cover",
+                                }}
+                            />
+                        </Box>
+                    )}
                     <TextField
                         margin="normal"
                         required

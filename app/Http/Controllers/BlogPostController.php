@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class BlogPostController extends Controller
 {
@@ -34,7 +35,13 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'author_id' => 'required|integer|exists:users,id',
+            'banner_image' => 'nullable|image|max:1024', // 1MB Max
         ]);
+
+        if ($request->hasFile('banner_image')) {
+            $path = $request->file('banner_image')->store('banner_images', 'public');
+            $validatedData['banner_image'] = basename($path); // Store only the file name
+        }
 
         BlogPost::create($validatedData);
         return redirect()->route('blogposts.index')->with('success', 'Post created successfully');
@@ -60,7 +67,17 @@ class BlogPostController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
             'author_id' => 'sometimes|required|integer|exists:users,id',
+            'banner_image' => 'nullable|image|max:1024', // 1MB Max
         ]);
+
+        if ($request->hasFile('banner_image')) {
+            // Delete the old banner image if it exists
+            if ($post->banner_image) {
+                Storage::disk('public')->delete('banner_images/' . $post->banner_image);
+            }
+            $path = $request->file('banner_image')->store('banner_images', 'public');
+            $validatedData['banner_image'] = basename($path); // Store only the file name
+        }
 
         $post->update($validatedData);
         return redirect()->route('blogposts.index')->with('success', 'Post updated successfully');
