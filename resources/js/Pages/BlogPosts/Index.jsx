@@ -1,6 +1,18 @@
 import React from "react";
 import { InertiaLink } from "@inertiajs/inertia-react";
+import DashboardTemplate from "@/Components/DashboardTemplate";
 import { router } from "@inertiajs/react";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button,
+    Typography,
+} from "@mui/material";
 
 const Index = ({ posts }) => {
     const handleDelete = (id) => {
@@ -10,27 +22,61 @@ const Index = ({ posts }) => {
     };
 
     return (
-        <div>
-            <h1>Blog Posts</h1>
-            <InertiaLink href={route("blogposts.create")}>
+        <DashboardTemplate>
+            <Typography variant="h4" gutterBottom>
+                Blog Posts
+            </Typography>
+            <Button
+                variant="contained"
+                color="primary"
+                component={InertiaLink}
+                href={route("blogposts.create")}
+                style={{ marginBottom: "20px" }}
+            >
                 Create New Post
-            </InertiaLink>
-            <ul>
-                {posts.map((post) => (
-                    <li key={post.id}>
-                        <InertiaLink href={route("blogposts.show", post.id)}>
-                            {post.title}
-                        </InertiaLink>
-                        <InertiaLink href={route("blogposts.edit", post.id)}>
-                            Edit
-                        </InertiaLink>
-                        <button onClick={() => handleDelete(post.id)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+            </Button>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell align="right">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {posts.map((post) => (
+                            <TableRow key={post.id}>
+                                <TableCell>
+                                    <InertiaLink
+                                        href={route("blogposts.show", post.id)}
+                                    >
+                                        {post.title}
+                                    </InertiaLink>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        component={InertiaLink}
+                                        href={route("blogposts.edit", post.id)}
+                                        style={{ marginRight: "10px" }}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => handleDelete(post.id)}
+                                    >
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </DashboardTemplate>
     );
 };
 

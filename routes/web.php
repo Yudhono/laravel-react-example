@@ -8,6 +8,7 @@ use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\ProposalsController;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -63,6 +64,18 @@ Route::get('/proposals/download/{file}', function ($file) {
     return Storage::download($filePath);
 })->name('proposals.download');
 
+Route::post('/api/upload-image', function (Request $request) {
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('images', 'public');
+        return response()->json(['url' => Storage::url($path)]);
+    }
+    return response()->json(['error' => 'No image uploaded'], 400);
+});
+
 Route::resource('qnas', QnaController::class);
+
+// Route::get('/{any}', function () {
+//     return view('index', ['csrf_token' => csrf_token()]);
+// })->where('any', '.*');
 
 require __DIR__.'/auth.php';

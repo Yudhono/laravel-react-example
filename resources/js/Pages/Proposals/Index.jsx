@@ -1,6 +1,19 @@
 import React from "react";
+import DashboardTemplate from "@/Components/DashboardTemplate";
 import { Inertia } from "@inertiajs/inertia";
 import { InertiaLink } from "@inertiajs/inertia-react";
+import {
+    Container,
+    Typography,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+} from "@mui/material";
 
 const Index = ({ proposals }) => {
     const handleDelete = (id) => {
@@ -10,31 +23,68 @@ const Index = ({ proposals }) => {
     };
 
     return (
-        <div>
-            <h1>Proposals</h1>
-            <InertiaLink href={route("proposals.create")}>
+        <DashboardTemplate>
+            <Typography variant="h4" gutterBottom>
+                Proposals
+            </Typography>
+            <Button
+                variant="contained"
+                color="primary"
+                component={InertiaLink}
+                href={route("proposals.create")}
+            >
                 Create New Proposal
-            </InertiaLink>
-            <ul>
-                {proposals.map((proposal) => (
-                    <li key={proposal.id}>
-                        <InertiaLink
-                            href={route("proposals.show", proposal.id)}
-                        >
-                            {proposal.title}
-                        </InertiaLink>
-                        <InertiaLink
-                            href={route("proposals.edit", proposal.id)}
-                        >
-                            Edit
-                        </InertiaLink>
-                        <button onClick={() => handleDelete(proposal.id)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+            </Button>
+            <TableContainer component={Paper} style={{ marginTop: 20 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell align="right">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {proposals.map((proposal) => (
+                            <TableRow key={proposal.id}>
+                                <TableCell component="th" scope="row">
+                                    <InertiaLink
+                                        href={route(
+                                            "proposals.show",
+                                            proposal.id
+                                        )}
+                                    >
+                                        {proposal.title}
+                                    </InertiaLink>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        component={InertiaLink}
+                                        href={route(
+                                            "proposals.edit",
+                                            proposal.id
+                                        )}
+                                        style={{ marginRight: 10 }}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="default"
+                                        onClick={() =>
+                                            handleDelete(proposal.id)
+                                        }
+                                    >
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </DashboardTemplate>
     );
 };
 
