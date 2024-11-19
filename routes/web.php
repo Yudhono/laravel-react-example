@@ -9,6 +9,7 @@ use App\Http\Controllers\ProposalsController;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Http\Controllers\FaqController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -27,9 +28,7 @@ Route::get('/blog', function () {
     return Inertia::render('Blog');
 })->name('blog');
 
-Route::get('/faq', function () {
-    return Inertia::render('Faq');
-})->name('faq');
+Route::get('/faq', [QnaController::class, 'faq'])->name('faq');
 
 Route::middleware('auth')->group(function () {
     // profile

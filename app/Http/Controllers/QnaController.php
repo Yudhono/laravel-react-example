@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Qna;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Faq;
 
 class QnaController extends Controller
 {
@@ -61,5 +62,21 @@ class QnaController extends Controller
         $qna->delete();
 
         return redirect()->route('qnas.index')->with('success', 'QnA deleted successfully.');
+    }
+
+    public function faq(Request $request)
+    {
+        $query = Qna::query();
+
+        if ($request->has('search')) {
+            $query->where('question', 'ILIKE', '%' . $request->input('search') . '%');
+        }
+
+        $faqs = $query->paginate(5); // Adjust the number of items per page as needed
+
+        return Inertia::render('Faq', [
+            'faqs' => $faqs,
+            'filters' => $request->only(['search']),
+        ]);
     }
 }
