@@ -23,6 +23,14 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/blog', function () {
+    return Inertia::render('Blog');
+})->name('blog');
+
+Route::get('/faq', function () {
+    return Inertia::render('Faq');
+})->name('faq');
+
 Route::middleware('auth')->group(function () {
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

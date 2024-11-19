@@ -51,8 +51,10 @@
         "@tiptap/pm": "^2.9.1",
         "@tiptap/react": "^2.9.1",
         "@tiptap/starter-kit": "^2.9.1",
+        "aos": "^2.3.4",
         "babel-loader": "^9.2.1",
         "draft-js": "^0.11.7",
+        "flowbite-react": "^0.10.2",
         "mui-tiptap": "^1.13.0",
         "react-draft-wysiwyg": "^1.15.0"
     }
