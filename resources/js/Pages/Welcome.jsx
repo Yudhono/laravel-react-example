@@ -65,7 +65,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 <a
                                     key={item.name}
                                     href={item.href}
-                                    className="text-sm/6 font-semibold text-gray-900"
+                                    className="text-sm/6 font-semibold text-gray-900 relative w-fit block after:block after:content-[''] after:absolute after:h-[3px] after:bg-black after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-right"
                                 >
                                     {item.name}
                                 </a>
