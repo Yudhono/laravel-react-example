@@ -30,6 +30,9 @@ Route::get('/blog', function () {
 
 Route::get('/faq', [QnaController::class, 'faq'])->name('faq');
 
+Route::get('/propose', [ProposalsController::class, 'createForUser'])->name('proposals.createForUser');
+Route::post('/propose', [ProposalsController::class, 'storeForUser'])->name('proposals.storeForUser');
+
 Route::middleware('auth')->group(function () {
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,12 +56,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/blogposts/{blogpost}', [BlogPostController::class, 'destroy'])->name('blogposts.destroy');
     // proposals
     Route::get('/proposals', [ProposalsController::class, 'index'])->name('proposals.index');
-    Route::get('/proposals/create', [ProposalsController::class, 'create'])->name('proposals.create');
-    Route::post('/proposals', [ProposalsController::class, 'store'])->name('proposals.store');
+    Route::get('/proposals/create', [ProposalsController::class, 'createForAdmin'])->name('proposals.createForAdmin');
+    Route::post('/proposals', [ProposalsController::class, 'storeForAdmin'])->name('proposals.storeForAdmin');
     Route::get('/proposals/{proposal}', [ProposalsController::class, 'show'])->name('proposals.show');
     Route::get('/proposals/{proposal}/edit', [ProposalsController::class, 'edit'])->name('proposals.edit');
     Route::put('/proposals/{proposal}', [ProposalsController::class, 'update'])->name('proposals.update');
     Route::delete('/proposals/{proposal}', [ProposalsController::class, 'destroy'])->name('proposals.destroy');
+    Route::post('/proposals/{id}/update-status', [ProposalsController::class, 'updateStatus'])->name('proposals.updateStatus');
 });
 
 Route::get('/proposals/download/{file}', function ($file) {

@@ -19,6 +19,13 @@ class Proposal extends Model
         'contact_email',
         'proposal_file',
         'reviewed_by',
+        'proposal_submit_id',
+        'contact_phone',
+        'university',
+        'faculty',
+        'study_program',
+        'organization',
+        'personal_identification_number',
     ];
 
     public function reviewer()
