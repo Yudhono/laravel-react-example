@@ -26,10 +26,16 @@ class Proposal extends Model
         'study_program',
         'organization',
         'personal_identification_number',
+        'remark',
     ];
 
     public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(ProposalActivity::class);
     }
 }
