@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/proposals/{proposal}', [ProposalsController::class, 'update'])->name('proposals.update');
     Route::delete('/proposals/{proposal}', [ProposalsController::class, 'destroy'])->name('proposals.destroy');
     Route::post('/proposals/{id}/update-status', [ProposalsController::class, 'updateStatus'])->name('proposals.updateStatus');
+    Route::post('/proposals/{id}/add-activity', [ProposalsController::class, 'addActivity'])->name('proposals.addActivity');
 });
 
 Route::get('/proposals/download/{file}', function ($file) {

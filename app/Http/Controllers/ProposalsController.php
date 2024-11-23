@@ -8,6 +8,8 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Models\ProposalActivity;
+use App\Models\ProposalActivityTimeSlot;
 
 class ProposalsController extends Controller
 {
@@ -164,7 +166,46 @@ class ProposalsController extends Controller
         ]);
 
         $proposal->update(['status' => $validatedData['status']]);
+
+        if ($validatedData['status'] === 'APPROVED') {
+            return Inertia::render('Proposals/Edit', ['proposal' => $proposal, 'showModal' => true]);
+        }
+
         return redirect()->route('proposals.index')->with('success', 'Proposal status updated successfully');
+    }
+
+    public function addActivity(Request $request, $id)
+    {
+        Log::info('addActivity called with data:', $request->all());
+
+        $validatedData = $request->validate([
+            'proposal_id' => 'required|exists:proposals,id', // Validate proposal_id
+            'collaborator_pic_name' => 'required|string|max:255',
+            'collaborator_pic_phone' => 'required|string|max:255',
+            'activity_date_start' => 'required|date',
+            'activity_date_end' => 'required|date',
+        ]);
+
+        $proposalActivity = ProposalActivity::create([
+            'proposal_id' => $validatedData['proposal_id'],
+            'collaborator_pic_name' => $validatedData['collaborator_pic_name'],
+            'collaborator_pic_phone' => $validatedData['collaborator_pic_phone'],// Adjust as needed
+            'remark' => 'default_remark', // Adjust as needed
+        ]);
+
+        ProposalActivityTimeSlot::create([
+            'proposal_activity_id' => $proposalActivity->id,
+            'start_time' => $validatedData['activity_date_start'],
+            'end_time' => $validatedData['activity_date_end'], // Adjust as needed
+        ]);
+
+        // Update the proposal status to APPROVED
+        $proposal = Proposal::find($validatedData['proposal_id']);
+        $proposal->update(['status' => 'APPROVED']);
+
+        Log::info('Proposal Activity Time Slot Created');
+
+        return redirect()->route('proposals.index')->with('success', 'Activity added successfully');
     }
 
     private function generateProposalSubmitId($data)

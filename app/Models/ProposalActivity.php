@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,10 +12,8 @@ class ProposalActivity extends Model
 
     protected $fillable = [
         'proposal_id',
-        'community',
-        'collaborator',
-        'start_time',
-        'end_time',
+        'collaborator_pic_name',
+        'collaborator_pic_phone',
         'remark',
     ];
 
