@@ -24,6 +24,6 @@ class ProposalActivity extends Model
 
     public function timeSlots()
     {
-        return $this->hasMany(ProposalActivityTimeSlot::class);
+        return $this->hasMany(ProposalActivityTimeSlot::class, 'proposal_activity_id');
     }
 }

@@ -68,24 +68,38 @@ const DashboardTemplate = ({ children }) => {
                 <Divider />
                 <List>
                     <ListItem
+                        sx={{ cursor: "pointer" }}
                         button
                         onClick={() => handleNavigation("/dashboard")}
                     >
                         <ListItemText primary="Dashboard" />
                     </ListItem>
                     <ListItem
+                        sx={{ cursor: "pointer" }}
                         button
                         onClick={() => handleNavigation("/proposals")}
                     >
                         <ListItemText primary="Proposals" />
                     </ListItem>
                     <ListItem
+                        sx={{ cursor: "pointer" }}
+                        button
+                        onClick={() => handleNavigation("/proposal-activities")}
+                    >
+                        <ListItemText primary="Proposals Activities" />
+                    </ListItem>
+                    <ListItem
+                        sx={{ cursor: "pointer" }}
                         button
                         onClick={() => handleNavigation("/blogposts")}
                     >
                         <ListItemText primary="Blogposts" />
                     </ListItem>
-                    <ListItem button onClick={() => handleNavigation("/qnas")}>
+                    <ListItem
+                        sx={{ cursor: "pointer" }}
+                        button
+                        onClick={() => handleNavigation("/qnas")}
+                    >
                         <ListItemText primary="QnA" />
                     </ListItem>
                 </List>

@@ -18,6 +18,6 @@ class ProposalActivityTimeSlot extends Model
 
     public function proposalActivity()
     {
-        return $this->belongsTo(ProposalActivity::class);
+        return $this->belongsTo(ProposalActivity::class, 'proposal_activity_id');
     }
 }

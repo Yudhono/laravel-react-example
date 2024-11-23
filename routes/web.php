@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\ProposalActivityController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -64,6 +65,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/proposals/{proposal}', [ProposalsController::class, 'destroy'])->name('proposals.destroy');
     Route::post('/proposals/{id}/update-status', [ProposalsController::class, 'updateStatus'])->name('proposals.updateStatus');
     Route::post('/proposals/{id}/add-activity', [ProposalsController::class, 'addActivity'])->name('proposals.addActivity');
+    Route::get('/proposal-activities', [ProposalActivityController::class, 'index'])->name('proposalActivities.index');
+    Route::get('/proposal-activities/{id}', [ProposalActivityController::class, 'show'])->name('proposalActivities.show');
 });
 
 Route::get('/proposals/download/{file}', function ($file) {

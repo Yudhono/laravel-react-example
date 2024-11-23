@@ -24,6 +24,12 @@ const Sidebar = ({ open, toggleDrawer, handleMenuClick }) => {
                     </ListItem>
                     <ListItem
                         button
+                        onClick={() => handleMenuClick("ProposalActivities")}
+                    >
+                        <ListItemText primary="Proposal Activities" />
+                    </ListItem>
+                    <ListItem
+                        button
                         onClick={() => handleMenuClick("Blogposts")}
                     >
                         <ListItemText primary="Blogposts" />

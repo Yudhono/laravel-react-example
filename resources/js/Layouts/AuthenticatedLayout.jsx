@@ -24,6 +24,8 @@ export default function AuthenticatedLayout({ header, children }) {
             router.get("/blogposts"); // Redirect to QnA index page
         } else if (page === "Proposals") {
             router.get("/proposals"); // Redirect to QnA index page
+        } else if (page === "ProposalActivities") {
+            router.get("/proposal-activities"); // Redirect to QnA index page
         }
     };
 
