@@ -18,13 +18,35 @@ class ProposalsController extends Controller
         $perPage = $request->input('perPage', 10);
         $currentPage = $request->input('page', 1);
 
-        $proposals = Proposal::paginate($perPage, ['*'], 'page', $currentPage);
+        $query = Proposal::query();
+
+        if ($request->has('title')) {
+            $query->where('title', 'ilike', '%' . $request->input('title') . '%');
+        }
+        if ($request->has('contact_name')) {
+            $query->where('contact_name', 'ilike', '%' . $request->input('contact_name') . '%');
+        }
+        if ($request->has('contact_phone')) {
+            $query->where('contact_phone', 'ilike', '%' . $request->input('contact_phone') . '%');
+        }
+        if ($request->has('proposal_submit_id')) {
+            $query->where('proposal_submit_id', 'ilike', '%' . $request->input('proposal_submit_id') . '%');
+        }
+        if ($request->has('university')) {
+            $query->where('university', 'ilike', '%' . $request->input('university') . '%');
+        }
+        if ($request->has('status')) {
+            $query->where('status', 'ilike', '%' . $request->input('status') . '%');
+        }
+
+        $proposals = $query->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $currentPage);
 
         return Inertia::render('Proposals/Index', [
             'proposals' => $proposals->items(),
             'total' => $proposals->total(),
             'perPage' => $proposals->perPage(),
             'currentPage' => $proposals->currentPage(),
+            'filters' => $request->all(),
         ]);
     }
 

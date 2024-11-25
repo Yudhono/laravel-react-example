@@ -28,12 +28,14 @@ import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { debounce } from "lodash";
 
 const Index = ({
     proposals,
     total,
     perPage: initialPerPage,
     currentPage: initialCurrentPage,
+    filters: initialFilters = {},
 }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedProposal, setSelectedProposal] = useState(null);
@@ -45,16 +47,21 @@ const Index = ({
     ]);
     const [perPage, setPerPage] = useState(initialPerPage || 10);
     const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
+    const [filters, setFilters] = useState(initialFilters);
 
     useEffect(() => {
-        if (currentPage !== initialCurrentPage || perPage !== initialPerPage) {
+        if (
+            currentPage !== initialCurrentPage ||
+            perPage !== initialPerPage ||
+            JSON.stringify(filters) !== JSON.stringify(initialFilters)
+        ) {
             Inertia.get(
                 route("proposals.index"),
-                { page: currentPage, perPage },
+                { page: currentPage, perPage, ...filters },
                 { preserveState: true, replace: true }
             );
         }
-    }, [currentPage, perPage]);
+    }, [currentPage, perPage, filters]);
 
     const handleStatusClick = (event, proposal) => {
         setAnchorEl(event.currentTarget);
@@ -138,6 +145,18 @@ const Index = ({
         setCurrentPage(1); // Reset to first page when perPage changes
     };
 
+    const handleFilterChange = debounce((event) => {
+        setFilters({
+            ...filters,
+            [event.target.name]: event.target.value,
+        });
+    }, 700);
+
+    const handleClearFilters = () => {
+        setFilters({});
+        setCurrentPage(1);
+    };
+
     const startItem = (currentPage - 1) * perPage + 1;
     const endItem = Math.min(currentPage * perPage, total);
 
@@ -155,6 +174,70 @@ const Index = ({
                 >
                     Create New Proposal
                 </Button>
+                <Box mt={2} mb={2}>
+                    <TextField
+                        label="Title"
+                        name="title"
+                        defaultValue={filters.title || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <TextField
+                        label="Contact Name"
+                        name="contact_name"
+                        defaultValue={filters.contact_name || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <TextField
+                        label="Contact Phone"
+                        name="contact_phone"
+                        defaultValue={filters.contact_phone || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <TextField
+                        label="Proposal Submit ID"
+                        name="proposal_submit_id"
+                        defaultValue={filters.proposal_submit_id || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <TextField
+                        label="University"
+                        name="university"
+                        defaultValue={filters.university || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <TextField
+                        label="Status"
+                        name="status"
+                        defaultValue={filters.status || ""}
+                        onChange={handleFilterChange}
+                        variant="outlined"
+                        size="small"
+                        style={{ marginRight: 10 }}
+                    />
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleClearFilters}
+                        style={{ marginLeft: 10 }}
+                    >
+                        Clear Filters
+                    </Button>
+                </Box>
                 <TableContainer component={Paper} style={{ marginTop: 20 }}>
                     <Table>
                         <TableHead>
@@ -223,7 +306,12 @@ const Index = ({
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" style={{ marginTop: 20 }}>
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    style={{ marginTop: 20 }}
+                >
                     <Typography variant="body2">
                         Displaying {startItem} - {endItem} of {total}
                     </Typography>
