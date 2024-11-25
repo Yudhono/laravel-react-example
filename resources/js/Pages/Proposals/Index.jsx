@@ -18,10 +18,12 @@ import {
     Modal,
     TextField,
     Box,
+    IconButton,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Index = ({ proposals }) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -29,8 +31,7 @@ const Index = ({ proposals }) => {
     const [showModal, setShowModal] = useState(false);
     const [collaboratorPicName, setCollaboratorPicName] = useState("");
     const [collaboratorPicPhone, setCollaboratorPicPhone] = useState("");
-    const [activityDateStart, setActivityDateStart] = useState(moment());
-    const [activityDateEnd, setActivityDateEnd] = useState(moment());
+    const [activityDates, setActivityDates] = useState([{ start: moment(), end: moment() }]);
 
     const handleStatusClick = (event, proposal) => {
         setAnchorEl(event.currentTarget);
@@ -59,6 +60,21 @@ const Index = ({ proposals }) => {
         handleStatusClose();
     };
 
+    const handleAddActivityDate = () => {
+        setActivityDates([...activityDates, { start: moment(), end: moment() }]);
+    };
+
+    const handleActivityDateChange = (index, field, value) => {
+        const newActivityDates = [...activityDates];
+        newActivityDates[index][field] = value;
+        setActivityDates(newActivityDates);
+    };
+
+    const handleRemoveActivityDate = (index) => {
+        const newActivityDates = activityDates.filter((_, i) => i !== index);
+        setActivityDates(newActivityDates);
+    };
+
     const handleModalSubmit = () => {
         if (!selectedProposal) {
             console.error("No proposal selected");
@@ -66,16 +82,14 @@ const Index = ({ proposals }) => {
         }
 
         const activityData = {
-            proposal_id: selectedProposal.id, // Ensure proposal_id is included
+            proposal_id: selectedProposal.id,
             collaborator_pic_name: collaboratorPicName,
             collaborator_pic_phone: collaboratorPicPhone,
-            activity_date_start: activityDateStart.format(
-                "YYYY-MM-DD HH:mm:ss"
-            ),
-            activity_date_end: activityDateEnd.format("YYYY-MM-DD HH:mm:ss"),
+            activity_dates: activityDates.map(date => ({
+                start: date.start.format("YYYY-MM-DD HH:mm:ss"),
+                end: date.end.format("YYYY-MM-DD HH:mm:ss"),
+            })),
         };
-        console.log(739812, "activityData", activityData);
-        console.log(739812, "selectedProposal", selectedProposal);
         Inertia.post(
             route("proposals.addActivity", selectedProposal.id),
             activityData
@@ -219,34 +233,32 @@ const Index = ({ proposals }) => {
                             fullWidth
                             margin="normal"
                         />
-                        <DatePicker
-                            label="Activity Date Start"
-                            value={activityDateStart}
-                            onChange={(newValue) =>
-                                setActivityDateStart(newValue)
-                            }
-                            renderInput={(props) => (
-                                <TextField
-                                    {...props}
-                                    fullWidth
-                                    margin="normal"
+                        {activityDates.map((date, index) => (
+                            <Box key={index} display="flex" alignItems="center">
+                                <DateTimePicker
+                                    label="Activity Date Start"
+                                    value={date.start}
+                                    onChange={(newValue) => handleActivityDateChange(index, 'start', newValue)}
+                                    renderInput={(props) => (
+                                        <TextField {...props} fullWidth margin="normal" />
+                                    )}
                                 />
-                            )}
-                        />
-                        <DatePicker
-                            label="Activity Date Start"
-                            value={activityDateEnd}
-                            onChange={(newValue) =>
-                                setActivityDateEnd(newValue)
-                            }
-                            renderInput={(props) => (
-                                <TextField
-                                    {...props}
-                                    fullWidth
-                                    margin="normal"
+                                <DateTimePicker
+                                    label="Activity Date End"
+                                    value={date.end}
+                                    onChange={(newValue) => handleActivityDateChange(index, 'end', newValue)}
+                                    renderInput={(props) => (
+                                        <TextField {...props} fullWidth margin="normal" />
+                                    )}
                                 />
-                            )}
-                        />
+                                <IconButton onClick={() => handleRemoveActivityDate(index)} color="secondary">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Box>
+                        ))}
+                        <Button onClick={handleAddActivityDate} variant="contained" color="secondary" fullWidth>
+                            Add Another Date
+                        </Button>
                         <Button
                             onClick={handleModalSubmit}
                             variant="contained"

@@ -35,8 +35,7 @@ const Index = ({ proposalActivities }) => {
                                 <TableCell>Collaborator PIC Name</TableCell>
                                 <TableCell>Collaborator PIC Phone</TableCell>
                                 <TableCell>Remark</TableCell>
-                                <TableCell>Start Time</TableCell>
-                                <TableCell>End Time</TableCell>
+                                <TableCell>Time Slots</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -59,15 +58,20 @@ const Index = ({ proposalActivities }) => {
                                     <TableCell>{activity.remark}</TableCell>
                                     <TableCell>
                                         {activity.time_slots &&
-                                        activity.time_slots.length > 0
-                                            ? activity.time_slots[0].start_time
-                                            : "N/A"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {activity.time_slots &&
-                                        activity.time_slots.length > 0
-                                            ? activity.time_slots[0].end_time
-                                            : "N/A"}
+                                        activity.time_slots.length > 0 ? (
+                                            <ul>
+                                                {activity.time_slots.map(
+                                                    (slot, index) => (
+                                                        <li key={index}>
+                                                            {slot.start_time} -{" "}
+                                                            {slot.end_time}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            "N/A"
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}

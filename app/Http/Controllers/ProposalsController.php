@@ -179,27 +179,29 @@ class ProposalsController extends Controller
         Log::info('addActivity called with data:', $request->all());
 
         $validatedData = $request->validate([
-            'proposal_id' => 'required|exists:proposals,id', // Validate proposal_id
+            'proposal_id' => 'required|exists:proposals,id',
             'collaborator_pic_name' => 'required|string|max:255',
             'collaborator_pic_phone' => 'required|string|max:255',
-            'activity_date_start' => 'required|date',
-            'activity_date_end' => 'required|date',
+            'activity_dates' => 'required|array',
+            'activity_dates.*.start' => 'required|date',
+            'activity_dates.*.end' => 'required|date',
         ]);
 
         $proposalActivity = ProposalActivity::create([
             'proposal_id' => $validatedData['proposal_id'],
             'collaborator_pic_name' => $validatedData['collaborator_pic_name'],
-            'collaborator_pic_phone' => $validatedData['collaborator_pic_phone'],// Adjust as needed
-            'remark' => 'default_remark', // Adjust as needed
+            'collaborator_pic_phone' => $validatedData['collaborator_pic_phone'],
+            'remark' => 'default_remark',
         ]);
 
-        ProposalActivityTimeSlot::create([
-            'proposal_activity_id' => $proposalActivity->id,
-            'start_time' => $validatedData['activity_date_start'],
-            'end_time' => $validatedData['activity_date_end'], // Adjust as needed
-        ]);
+        foreach ($validatedData['activity_dates'] as $date) {
+            ProposalActivityTimeSlot::create([
+                'proposal_activity_id' => $proposalActivity->id,
+                'start_time' => $date['start'],
+                'end_time' => $date['end'],
+            ]);
+        }
 
-        // Update the proposal status to APPROVED
         $proposal = Proposal::find($validatedData['proposal_id']);
         $proposal->update(['status' => 'APPROVED']);
 
