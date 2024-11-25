@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardTemplate from "@/Components/DashboardTemplate";
 import { Inertia } from "@inertiajs/inertia";
 import { InertiaLink } from "@inertiajs/inertia-react";
 import {
-    Container,
     Typography,
     Button,
     Table,
@@ -19,19 +18,43 @@ import {
     TextField,
     Box,
     IconButton,
+    Pagination,
+    Select,
+    FormControl,
+    InputLabel,
+    Stack,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Index = ({ proposals }) => {
+const Index = ({
+    proposals,
+    total,
+    perPage: initialPerPage,
+    currentPage: initialCurrentPage,
+}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedProposal, setSelectedProposal] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [collaboratorPicName, setCollaboratorPicName] = useState("");
     const [collaboratorPicPhone, setCollaboratorPicPhone] = useState("");
-    const [activityDates, setActivityDates] = useState([{ start: moment(), end: moment() }]);
+    const [activityDates, setActivityDates] = useState([
+        { start: moment(), end: moment() },
+    ]);
+    const [perPage, setPerPage] = useState(initialPerPage || 10);
+    const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
+
+    useEffect(() => {
+        if (currentPage !== initialCurrentPage || perPage !== initialPerPage) {
+            Inertia.get(
+                route("proposals.index"),
+                { page: currentPage, perPage },
+                { preserveState: true, replace: true }
+            );
+        }
+    }, [currentPage, perPage]);
 
     const handleStatusClick = (event, proposal) => {
         setAnchorEl(event.currentTarget);
@@ -61,7 +84,10 @@ const Index = ({ proposals }) => {
     };
 
     const handleAddActivityDate = () => {
-        setActivityDates([...activityDates, { start: moment(), end: moment() }]);
+        setActivityDates([
+            ...activityDates,
+            { start: moment(), end: moment() },
+        ]);
     };
 
     const handleActivityDateChange = (index, field, value) => {
@@ -85,7 +111,7 @@ const Index = ({ proposals }) => {
             proposal_id: selectedProposal.id,
             collaborator_pic_name: collaboratorPicName,
             collaborator_pic_phone: collaboratorPicPhone,
-            activity_dates: activityDates.map(date => ({
+            activity_dates: activityDates.map((date) => ({
                 start: date.start.format("YYYY-MM-DD HH:mm:ss"),
                 end: date.end.format("YYYY-MM-DD HH:mm:ss"),
             })),
@@ -102,6 +128,18 @@ const Index = ({ proposals }) => {
             Inertia.delete(route("proposals.destroy", id));
         }
     };
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
+    const handlePerPageChange = (event) => {
+        setPerPage(event.target.value);
+        setCurrentPage(1); // Reset to first page when perPage changes
+    };
+
+    const startItem = (currentPage - 1) * perPage + 1;
+    const endItem = Math.min(currentPage * perPage, total);
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -185,6 +223,39 @@ const Index = ({ proposals }) => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" style={{ marginTop: 20 }}>
+                    <Typography variant="body2">
+                        Displaying {startItem} - {endItem} of {total}
+                    </Typography>
+                    <Stack direction="row" alignItems="center">
+                        <FormControl
+                            variant="outlined"
+                            style={{
+                                marginRight: 20,
+                                minWidth: 120,
+                            }}
+                        >
+                            <InputLabel>Items per page</InputLabel>
+                            <Select
+                                value={perPage}
+                                onChange={handlePerPageChange}
+                                label="Items per page"
+                                size="small"
+                            >
+                                <MenuItem value={5}>5</MenuItem>
+                                <MenuItem value={10}>10</MenuItem>
+                                <MenuItem value={20}>20</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Pagination
+                            size="medium"
+                            count={Math.ceil(total / perPage)}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="primary"
+                        />
+                    </Stack>
+                </Stack>
                 <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
@@ -238,25 +309,55 @@ const Index = ({ proposals }) => {
                                 <DateTimePicker
                                     label="Activity Date Start"
                                     value={date.start}
-                                    onChange={(newValue) => handleActivityDateChange(index, 'start', newValue)}
+                                    onChange={(newValue) =>
+                                        handleActivityDateChange(
+                                            index,
+                                            "start",
+                                            newValue
+                                        )
+                                    }
                                     renderInput={(props) => (
-                                        <TextField {...props} fullWidth margin="normal" />
+                                        <TextField
+                                            {...props}
+                                            fullWidth
+                                            margin="normal"
+                                        />
                                     )}
                                 />
                                 <DateTimePicker
                                     label="Activity Date End"
                                     value={date.end}
-                                    onChange={(newValue) => handleActivityDateChange(index, 'end', newValue)}
+                                    onChange={(newValue) =>
+                                        handleActivityDateChange(
+                                            index,
+                                            "end",
+                                            newValue
+                                        )
+                                    }
                                     renderInput={(props) => (
-                                        <TextField {...props} fullWidth margin="normal" />
+                                        <TextField
+                                            {...props}
+                                            fullWidth
+                                            margin="normal"
+                                        />
                                     )}
                                 />
-                                <IconButton onClick={() => handleRemoveActivityDate(index)} color="secondary">
+                                <IconButton
+                                    onClick={() =>
+                                        handleRemoveActivityDate(index)
+                                    }
+                                    color="secondary"
+                                >
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
                         ))}
-                        <Button onClick={handleAddActivityDate} variant="contained" color="secondary" fullWidth>
+                        <Button
+                            onClick={handleAddActivityDate}
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                        >
                             Add Another Date
                         </Button>
                         <Button

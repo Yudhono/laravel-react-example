@@ -13,10 +13,19 @@ use App\Models\ProposalActivityTimeSlot;
 
 class ProposalsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $proposals = Proposal::all();
-        return Inertia::render('Proposals/Index', ['proposals' => $proposals]);
+        $perPage = $request->input('perPage', 10);
+        $currentPage = $request->input('page', 1);
+
+        $proposals = Proposal::paginate($perPage, ['*'], 'page', $currentPage);
+
+        return Inertia::render('Proposals/Index', [
+            'proposals' => $proposals->items(),
+            'total' => $proposals->total(),
+            'perPage' => $proposals->perPage(),
+            'currentPage' => $proposals->currentPage(),
+        ]);
     }
 
     public function show($id)
