@@ -34,6 +34,9 @@ Route::get('/faq', [QnaController::class, 'faq'])->name('faq');
 Route::get('/propose', [ProposalsController::class, 'createForUser'])->name('proposals.createForUser');
 Route::post('/propose', [ProposalsController::class, 'storeForUser'])->name('proposals.storeForUser');
 
+Route::get('/proposal-status/{proposal_submit_id}', [ProposalsController::class, 'checkStatus'])->name('proposal.status');
+Route::get('/proposal-status', [ProposalsController::class, 'proposalStatusView'])->name('proposal.proposalStatusView');
+
 Route::middleware('auth')->group(function () {
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

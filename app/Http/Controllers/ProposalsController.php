@@ -210,6 +210,21 @@ class ProposalsController extends Controller
         return redirect()->route('proposals.index')->with('success', 'Activity added successfully');
     }
 
+    public function proposalStatusView()
+    {
+        return Inertia::render('ProposalStatus', ['status' => null]);
+    }
+
+    public function checkStatus($proposal_submit_id)
+    {
+        $proposal = Proposal::where('proposal_submit_id', $proposal_submit_id)->first();
+
+        return Inertia::render('ProposalStatus', [
+            'status' => $proposal ? $proposal->status : 'No proposal found',
+            'proposal_submit_id' => $proposal_submit_id
+        ]);
+    }
+
     private function generateProposalSubmitId($data)
     {
         do {

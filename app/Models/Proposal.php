@@ -11,6 +11,7 @@ class Proposal extends Model
     protected $table = 'proposals';
 
     protected $fillable = [
+        'user_id',
         'title',
         'description',
         'status',
