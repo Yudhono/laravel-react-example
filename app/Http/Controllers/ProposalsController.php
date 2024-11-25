@@ -38,6 +38,11 @@ class ProposalsController extends Controller
         if ($request->has('status')) {
             $query->where('status', 'ilike', '%' . $request->input('status') . '%');
         }
+        if ($request->has('startDate') && $request->has('endDate')) {
+            $startDate = $request->input('startDate');
+            $endDate = $request->input('endDate') . ' 23:59:59';
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
 
         $proposals = $query->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $currentPage);
 

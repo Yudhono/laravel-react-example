@@ -29,6 +29,8 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { debounce } from "lodash";
+import { DateRangePicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
 
 const Index = ({
     proposals,
@@ -48,6 +50,10 @@ const Index = ({
     const [perPage, setPerPage] = useState(initialPerPage || 10);
     const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
     const [filters, setFilters] = useState(initialFilters);
+    const [dateRange, setDateRange] = useState([
+        filters.startDate ? new Date(filters.startDate) : null,
+        filters.endDate ? new Date(filters.endDate) : null,
+    ]);
 
     useEffect(() => {
         if (
@@ -152,8 +158,18 @@ const Index = ({
         });
     }, 700);
 
+    const handleDateRangeChange = (value) => {
+        setDateRange(value);
+        setFilters({
+            ...filters,
+            startDate: value[0] ? moment(value[0]).format("YYYY-MM-DD") : null,
+            endDate: value[1] ? moment(value[1]).format("YYYY-MM-DD") : null,
+        });
+    };
+
     const handleClearFilters = () => {
         setFilters({});
+        setDateRange([null, null]);
         setCurrentPage(1);
     };
 
@@ -229,6 +245,12 @@ const Index = ({
                         size="small"
                         style={{ marginRight: 10 }}
                     />
+                    <DateRangePicker
+                        value={dateRange}
+                        onChange={handleDateRangeChange}
+                        placeholder="Select Date Range"
+                        style={{ marginRight: 10 }}
+                    />
                     <Button
                         variant="contained"
                         color="secondary"
@@ -248,6 +270,7 @@ const Index = ({
                                 <TableCell>Proposal Submit ID</TableCell>
                                 <TableCell>University</TableCell>
                                 <TableCell>Status</TableCell>
+                                <TableCell>Created At</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -275,6 +298,11 @@ const Index = ({
                                     </TableCell>
                                     <TableCell>{proposal.university}</TableCell>
                                     <TableCell>{proposal.status}</TableCell>
+                                    <TableCell>
+                                        {moment(proposal.created_at).format(
+                                            "YYYY-MM-DD"
+                                        )}
+                                    </TableCell>
                                     <TableCell align="right">
                                         <Button
                                             variant="contained"
