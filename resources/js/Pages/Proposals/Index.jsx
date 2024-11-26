@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import DashboardTemplate from "@/Components/DashboardTemplate";
 import { Inertia } from "@inertiajs/inertia";
 import { InertiaLink } from "@inertiajs/inertia-react";
@@ -23,14 +23,20 @@ import {
     FormControl,
     InputLabel,
     Stack,
+    Tooltip,
 } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { debounce } from "lodash";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 const Index = ({
     proposals,
@@ -50,23 +56,40 @@ const Index = ({
     const [perPage, setPerPage] = useState(initialPerPage || 10);
     const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
     const [filters, setFilters] = useState(initialFilters);
+
+    const currentMonthStart = moment().startOf("month").toDate();
+    const currentMonthEnd = moment().endOf("month").toDate();
+
     const [dateRange, setDateRange] = useState([
-        filters.startDate ? new Date(filters.startDate) : null,
-        filters.endDate ? new Date(filters.endDate) : null,
+        filters.startDate ? new Date(filters.startDate) : currentMonthStart,
+        filters.endDate ? new Date(filters.endDate) : currentMonthEnd,
     ]);
+    const [showFilters, setShowFilters] = useState(false);
+    const isInitialMount = useRef(true);
+
+    const query = useMemo(
+        () => ({
+            page: currentPage,
+            perPage,
+            ...filters,
+        }),
+        [currentPage, perPage, filters]
+    );
 
     useEffect(() => {
-        if (
-            currentPage !== initialCurrentPage ||
-            perPage !== initialPerPage ||
-            JSON.stringify(filters) !== JSON.stringify(initialFilters)
-        ) {
-            Inertia.get(
-                route("proposals.index"),
-                { page: currentPage, perPage, ...filters },
-                { preserveState: true, replace: true }
-            );
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
         }
+
+        console.log("Sending query:", query); // Add this line for debugging
+
+        Inertia.get(route("proposals.index"), query, {
+            preserveState: true,
+            preserveScroll: true,
+        }).catch((error) => {
+            console.error("Error fetching proposals:", error); // Add this line for debugging
+        });
     }, [currentPage, perPage, filters]);
 
     const handleStatusClick = (event, proposal) => {
@@ -147,8 +170,9 @@ const Index = ({
     };
 
     const handlePerPageChange = (event) => {
-        setPerPage(event.target.value);
-        setCurrentPage(1); // Reset to first page when perPage changes
+        const newPerPage = event.target.value;
+        setPerPage(newPerPage);
+        setCurrentPage(1);
     };
 
     const handleFilterChange = debounce((event) => {
@@ -159,18 +183,37 @@ const Index = ({
     }, 700);
 
     const handleDateRangeChange = (value) => {
-        setDateRange(value);
-        setFilters({
-            ...filters,
-            startDate: value[0] ? moment(value[0]).format("YYYY-MM-DD") : null,
-            endDate: value[1] ? moment(value[1]).format("YYYY-MM-DD") : null,
-        });
+        console.log("Selected date range:", value); // Add this line for debugging
+        if (value === null) {
+            setDateRange([null, null]);
+            setFilters((prevFilters) => ({
+                ...prevFilters,
+                startDate: null,
+                endDate: null,
+            }));
+        } else {
+            setDateRange(value);
+            setFilters((prevFilters) => ({
+                ...prevFilters,
+                startDate: value[0]
+                    ? moment(value[0]).format("YYYY-MM-DD")
+                    : null,
+                endDate: value[1]
+                    ? moment(value[1]).format("YYYY-MM-DD")
+                    : null,
+            }));
+        }
+        setCurrentPage(1); // Reset to first page when filters change
     };
 
     const handleClearFilters = () => {
         setFilters({});
         setDateRange([null, null]);
         setCurrentPage(1);
+    };
+
+    const handleToggleFilters = () => {
+        setShowFilters(!showFilters);
     };
 
     const startItem = (currentPage - 1) * perPage + 1;
@@ -182,101 +225,129 @@ const Index = ({
                 <Typography variant="h4" gutterBottom>
                     Proposals
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    component={InertiaLink}
-                    href={route("proposals.createForAdmin")}
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
                 >
-                    Create New Proposal
-                </Button>
-                <Box mt={2} mb={2}>
-                    <TextField
-                        label="Title"
-                        name="title"
-                        defaultValue={filters.title || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
-                    <TextField
-                        label="Contact Name"
-                        name="contact_name"
-                        defaultValue={filters.contact_name || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
-                    <TextField
-                        label="Contact Phone"
-                        name="contact_phone"
-                        defaultValue={filters.contact_phone || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
-                    <TextField
-                        label="Proposal Submit ID"
-                        name="proposal_submit_id"
-                        defaultValue={filters.proposal_submit_id || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
-                    <TextField
-                        label="University"
-                        name="university"
-                        defaultValue={filters.university || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
-                    <TextField
-                        label="Status"
-                        name="status"
-                        defaultValue={filters.status || ""}
-                        onChange={handleFilterChange}
-                        variant="outlined"
-                        size="small"
-                        style={{ marginRight: 10 }}
-                    />
                     <DateRangePicker
                         value={dateRange}
                         onChange={handleDateRangeChange}
                         placeholder="Select Date Range"
-                        style={{ marginRight: 10 }}
+                        format="yyyy-MM-dd" // Ensure the format matches the expected date format
                     />
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleClearFilters}
-                        style={{ marginLeft: 10 }}
-                    >
-                        Clear Filters
-                    </Button>
-                </Box>
+                    <Stack direction="row" gap={2}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleClearFilters}
+                            style={{ marginLeft: 10 }}
+                        >
+                            Clear Filters
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="default"
+                            onClick={handleToggleFilters}
+                            startIcon={<FilterListIcon />}
+                        >
+                            {showFilters ? "Hide Filters" : "Show Filters"}
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            component={InertiaLink}
+                            href={route("proposals.createForAdmin")}
+                        >
+                            Create New Proposal
+                        </Button>
+                    </Stack>
+                </Stack>
+                {showFilters && (
+                    <Box mt={2} mb={2} display="flex" gap={2}>
+                        <TextField
+                            label="Title"
+                            name="title"
+                            defaultValue={filters.title || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <TextField
+                            label="Contact Name"
+                            name="contact_name"
+                            defaultValue={filters.contact_name || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <TextField
+                            label="Contact Phone"
+                            name="contact_phone"
+                            defaultValue={filters.contact_phone || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <TextField
+                            label="Proposal Submit ID"
+                            name="proposal_submit_id"
+                            defaultValue={filters.proposal_submit_id || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <TextField
+                            label="University"
+                            name="university"
+                            defaultValue={filters.university || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <TextField
+                            label="Status"
+                            name="status"
+                            defaultValue={filters.status || ""}
+                            onChange={handleFilterChange}
+                            variant="outlined"
+                            size="small"
+                            style={{ marginBottom: 10 }}
+                        />
+                    </Box>
+                )}
                 <TableContainer component={Paper} style={{ marginTop: 20 }}>
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell>Created At</TableCell>
                                 <TableCell>Title</TableCell>
                                 <TableCell>Contact Name</TableCell>
                                 <TableCell>Contact Phone</TableCell>
                                 <TableCell>Proposal Submit ID</TableCell>
                                 <TableCell>University</TableCell>
                                 <TableCell>Status</TableCell>
-                                <TableCell>Created At</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {proposals.map((proposal) => (
                                 <TableRow key={proposal.id}>
+                                    <TableCell
+                                        sx={{
+                                            width: 120,
+                                        }}
+                                    >
+                                        {moment(proposal.created_at).format(
+                                            "YYYY-MM-DD"
+                                        )}
+                                    </TableCell>
                                     <TableCell component="th" scope="row">
                                         <InertiaLink
                                             href={route(
@@ -298,36 +369,43 @@ const Index = ({
                                     </TableCell>
                                     <TableCell>{proposal.university}</TableCell>
                                     <TableCell>{proposal.status}</TableCell>
-                                    <TableCell>
-                                        {moment(proposal.created_at).format(
-                                            "YYYY-MM-DD"
-                                        )}
-                                    </TableCell>
                                     <TableCell align="right">
-                                        <Button
-                                            variant="contained"
-                                            color="secondary"
-                                            component={InertiaLink}
-                                            href={route(
-                                                "proposals.edit",
-                                                proposal.id
-                                            )}
-                                            style={{ marginRight: 10 }}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={(event) =>
-                                                handleStatusClick(
-                                                    event,
-                                                    proposal
-                                                )
-                                            }
-                                        >
-                                            Change Status
-                                        </Button>
+                                        <Stack direction="row">
+                                            <Tooltip
+                                                title="Edit"
+                                                placement="top"
+                                            >
+                                                <IconButton
+                                                    variant="contained"
+                                                    color="secondary"
+                                                    component={InertiaLink}
+                                                    href={route(
+                                                        "proposals.edit",
+                                                        proposal.id
+                                                    )}
+                                                    style={{ marginRight: 10 }}
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip
+                                                title="change proposl status"
+                                                placement="top"
+                                            >
+                                                <IconButton
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={(event) =>
+                                                        handleStatusClick(
+                                                            event,
+                                                            proposal
+                                                        )
+                                                    }
+                                                >
+                                                    <SettingsIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))}

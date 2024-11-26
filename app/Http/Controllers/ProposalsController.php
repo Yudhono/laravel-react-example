@@ -15,43 +15,37 @@ class ProposalsController extends Controller
 {
     public function index(Request $request)
     {
+        $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
-        $currentPage = $request->input('page', 1);
+        $filters = $request->except(['page', 'perPage']);
 
+        // Apply filters and pagination logic
         $query = Proposal::query();
 
-        if ($request->has('title')) {
-            $query->where('title', 'ilike', '%' . $request->input('title') . '%');
-        }
-        if ($request->has('contact_name')) {
-            $query->where('contact_name', 'ilike', '%' . $request->input('contact_name') . '%');
-        }
-        if ($request->has('contact_phone')) {
-            $query->where('contact_phone', 'ilike', '%' . $request->input('contact_phone') . '%');
-        }
-        if ($request->has('proposal_submit_id')) {
-            $query->where('proposal_submit_id', 'ilike', '%' . $request->input('proposal_submit_id') . '%');
-        }
-        if ($request->has('university')) {
-            $query->where('university', 'ilike', '%' . $request->input('university') . '%');
-        }
-        if ($request->has('status')) {
-            $query->where('status', 'ilike', '%' . $request->input('status') . '%');
-        }
-        if ($request->has('startDate') && $request->has('endDate')) {
-            $startDate = $request->input('startDate');
-            $endDate = $request->input('endDate') . ' 23:59:59';
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+        if (!empty($filters)) {
+            // Apply filters to the query
+            foreach ($filters as $key => $value) {
+                if ($key === 'startDate' && $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                } elseif ($key === 'endDate' && $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                } elseif ($value) {
+                    $query->where($key, 'like', "%$value%");
+                }
+            }
         }
 
-        $proposals = $query->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $currentPage);
+        // Order by created_at in descending order
+        $query->orderBy('created_at', 'desc');
+
+        $proposals = $query->paginate($perPage, ['*'], 'page', $page);
 
         return Inertia::render('Proposals/Index', [
             'proposals' => $proposals->items(),
             'total' => $proposals->total(),
             'perPage' => $proposals->perPage(),
             'currentPage' => $proposals->currentPage(),
-            'filters' => $request->all(),
+            'filters' => $filters,
         ]);
     }
 
