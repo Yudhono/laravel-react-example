@@ -219,13 +219,14 @@ class ProposalsController extends Controller
             'activity_dates' => 'required|array',
             'activity_dates.*.start' => 'required|date',
             'activity_dates.*.end' => 'required|date',
+            'remark' => 'nullable|string|max:255', // Add this line
         ]);
 
         $proposalActivity = ProposalActivity::create([
             'proposal_id' => $validatedData['proposal_id'],
             'collaborator_pic_name' => $validatedData['collaborator_pic_name'],
             'collaborator_pic_phone' => $validatedData['collaborator_pic_phone'],
-            'remark' => 'default_remark',
+            'remark' => $validatedData['remark'] ?? '', // Update this line
         ]);
 
         foreach ($validatedData['activity_dates'] as $date) {

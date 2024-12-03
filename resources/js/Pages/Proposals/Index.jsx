@@ -55,6 +55,7 @@ const Index = ({
     const [perPage, setPerPage] = useState(initialPerPage || 10);
     const [currentPage, setCurrentPage] = useState(initialCurrentPage || 1);
     const [filters, setFilters] = useState(initialFilters);
+    const [approvalRemark, setApprovalRemark] = useState("");
 
     const currentMonthStart = moment().startOf("month").toDate();
     const currentMonthEnd = moment().endOf("month").toDate();
@@ -169,12 +170,14 @@ const Index = ({
                 start: date.start.format("YYYY-MM-DD HH:mm:ss"),
                 end: date.end.format("YYYY-MM-DD HH:mm:ss"),
             })),
+            remark: approvalRemark, // Add this line
         };
         Inertia.post(
             route("proposals.addActivity", selectedProposal.id),
             activityData
         );
         setShowModal(false);
+        setApprovalRemark(""); // Reset the remark field
     };
 
     const handlePageChange = (event, value) => {
@@ -515,7 +518,17 @@ const Index = ({
                                     margin="normal"
                                 />
                             </Grid2>
-
+                            <Grid2 size={12}>
+                                <TextField
+                                    label="Approval Remark"
+                                    value={approvalRemark}
+                                    onChange={(e) =>
+                                        setApprovalRemark(e.target.value)
+                                    }
+                                    fullWidth
+                                    margin="normal"
+                                />
+                            </Grid2>
                             {activityDates.map((date, index) => (
                                 <Box
                                     key={index}
