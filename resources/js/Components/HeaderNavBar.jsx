@@ -2,10 +2,10 @@ import React from "react";
 
 export default function HeaderNavBar() {
     const navigation = [
-        { name: "Product", href: "#" },
-        { name: "Features", href: "#" },
-        { name: "Marketplace", href: "#" },
+        { name: "Home", href: "/" },
+        { name: "FAQ", href: "/faq" },
         { name: "Colaboration", href: "/propose" },
+        { name: "Blog", href: "/blog" },
     ];
     return (
         <header className="absolute inset-x-0 top-0 z-50">
