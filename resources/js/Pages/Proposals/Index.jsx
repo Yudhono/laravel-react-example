@@ -24,6 +24,7 @@ import {
     InputLabel,
     Stack,
     Tooltip,
+    Grid2,
 } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -472,96 +473,125 @@ const Index = ({
                             top: "50%",
                             left: "50%",
                             transform: "translate(-50%, -50%)",
-                            width: 400,
+                            width: 900,
                             bgcolor: "background.paper",
-                            border: "2px solid #000",
+                            borderRadius: 3,
                             boxShadow: 24,
                             p: 4,
                         }}
                     >
                         <h2>Fill Collaborator Details</h2>
-                        <TextField
-                            label="Collaborator PIC Name"
-                            value={collaboratorPicName}
-                            onChange={(e) =>
-                                setCollaboratorPicName(e.target.value)
-                            }
-                            fullWidth
-                            margin="normal"
-                        />
-                        <TextField
-                            label="Collaborator PIC Phone"
-                            value={collaboratorPicPhone}
-                            onChange={(e) =>
-                                setCollaboratorPicPhone(e.target.value)
-                            }
-                            fullWidth
-                            margin="normal"
-                        />
-                        {activityDates.map((date, index) => (
-                            <Box key={index} display="flex" alignItems="center">
-                                <DateTimePicker
-                                    label="Activity Date Start"
-                                    value={date.start}
-                                    onChange={(newValue) =>
-                                        handleActivityDateChange(
-                                            index,
-                                            "start",
-                                            newValue
-                                        )
+                        <Grid2 container spacing={2}>
+                            <Grid2 size={6}>
+                                <TextField
+                                    label="Collaborator PIC Name"
+                                    value={collaboratorPicName}
+                                    onChange={(e) =>
+                                        setCollaboratorPicName(e.target.value)
                                     }
-                                    renderInput={(props) => (
-                                        <TextField
-                                            {...props}
-                                            fullWidth
-                                            margin="normal"
-                                        />
-                                    )}
+                                    fullWidth
+                                    margin="normal"
                                 />
-                                <DateTimePicker
-                                    label="Activity Date End"
-                                    value={date.end}
-                                    onChange={(newValue) =>
-                                        handleActivityDateChange(
-                                            index,
-                                            "end",
-                                            newValue
-                                        )
+                            </Grid2>
+                            <Grid2 size={6}>
+                                <TextField
+                                    label="Collaborator PIC Phone"
+                                    value={collaboratorPicPhone}
+                                    onChange={(e) =>
+                                        setCollaboratorPicPhone(e.target.value)
                                     }
-                                    renderInput={(props) => (
-                                        <TextField
-                                            {...props}
-                                            fullWidth
-                                            margin="normal"
-                                        />
-                                    )}
+                                    fullWidth
+                                    margin="normal"
                                 />
-                                <IconButton
-                                    onClick={() =>
-                                        handleRemoveActivityDate(index)
-                                    }
-                                    color="secondary"
+                            </Grid2>
+
+                            {activityDates.map((date, index) => (
+                                <Box
+                                    key={index}
+                                    display="flex"
+                                    alignItems="center"
+                                    width="100%"
+                                    gap={3}
                                 >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Box>
-                        ))}
-                        <Button
-                            onClick={handleAddActivityDate}
-                            variant="contained"
-                            color="secondary"
-                            fullWidth
+                                    <DateTimePicker
+                                        label="Activity Date Start"
+                                        value={date.start}
+                                        onChange={(newValue) =>
+                                            handleActivityDateChange(
+                                                index,
+                                                "start",
+                                                newValue
+                                            )
+                                        }
+                                        renderInput={(props) => (
+                                            <TextField
+                                                {...props}
+                                                fullWidth
+                                                margin="normal"
+                                            />
+                                        )}
+                                    />
+
+                                    <DateTimePicker
+                                        label="Activity Date End"
+                                        value={date.end}
+                                        onChange={(newValue) =>
+                                            handleActivityDateChange(
+                                                index,
+                                                "end",
+                                                newValue
+                                            )
+                                        }
+                                        renderInput={(props) => (
+                                            <TextField
+                                                {...props}
+                                                fullWidth
+                                                margin="normal"
+                                            />
+                                        )}
+                                    />
+
+                                    <IconButton
+                                        onClick={() =>
+                                            handleRemoveActivityDate(index)
+                                        }
+                                        color="secondary"
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Box>
+                            ))}
+                        </Grid2>
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                                marginTop: 2,
+                            }}
                         >
-                            Add Another Date
-                        </Button>
-                        <Button
-                            onClick={handleModalSubmit}
-                            variant="contained"
-                            color="primary"
-                            fullWidth
+                            <Button
+                                onClick={handleAddActivityDate}
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Add Another Date
+                            </Button>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                marginTop: 2,
+                            }}
                         >
-                            Submit
-                        </Button>
+                            <Button
+                                onClick={handleModalSubmit}
+                                variant="contained"
+                                color="primary"
+                            >
+                                Submit
+                            </Button>
+                        </Box>
                     </Box>
                 </Modal>
             </DashboardTemplate>
