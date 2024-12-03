@@ -9,10 +9,19 @@ use App\Models\Faq;
 
 class QnaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $qnas = Qna::all();
-        return Inertia::render('Qnas/Index', ['qnas' => $qnas]);
+        $perPage = $request->input('per_page', 10); // Default to 10 if not provided
+        $qnas = Qna::paginate($perPage);
+        return Inertia::render('Qnas/Index', [
+            'qnas' => $qnas->items(),
+            'links' => [
+                'current_page' => $qnas->currentPage(),
+                'last_page' => $qnas->lastPage(),
+                'per_page' => $qnas->perPage(),
+                'total' => $qnas->total(),
+            ],
+        ]);
     }
 
     public function create()
