@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ProposalActivityController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -24,6 +25,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
 
 Route::get('/blog', function () {
     return Inertia::render('Blog');

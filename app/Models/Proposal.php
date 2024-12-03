@@ -29,6 +29,8 @@ class Proposal extends Model
         'remark',
     ];
 
+    protected $dates = ['created_at', 'updated_at']; // Ensure created_at is a date field
+
     public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
