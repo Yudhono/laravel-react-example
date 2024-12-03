@@ -12,10 +12,11 @@ class ProposalActivityController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('perPage', 10);
-        $proposalActivities = ProposalActivity::with('timeSlots')->paginate($perPage);
+        $proposalActivities = ProposalActivity::with(['timeSlots', 'proposal'])->paginate($perPage);
 
         return Inertia::render('ProposalActivities/Index', [
             'proposalActivities' => $proposalActivities->items(),
+            'proposal' => $proposalActivities->first()->proposal,   
             'currentPage' => $proposalActivities->currentPage(),
             'lastPage' => $proposalActivities->lastPage(),
             'perPage' => $perPage,
