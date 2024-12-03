@@ -95,7 +95,10 @@ class ProposalsController extends Controller
 
         Log::info('Proposal Created Successfully');
 
-        return redirect()->route('proposals.index')->with('success', 'Proposal created successfully');
+        return redirect()->route('proposal.submitted', ['proposal_submit_id' => $validatedData['proposal_submit_id']])->with([
+            'success' => 'Proposal created successfully',
+            'proposal_submit_id' => $validatedData['proposal_submit_id']
+        ]);
     }
 
     public function createForAdmin()

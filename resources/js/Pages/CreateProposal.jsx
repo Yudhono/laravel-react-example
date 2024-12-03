@@ -41,7 +41,12 @@ const CreateProposal = () => {
             formData.append(key, form[key]);
         }
 
-        Inertia.post(route("proposals.storeForUser"), formData);
+        Inertia.post(route("proposals.storeForUser"), formData, {
+            onSuccess: (page) => {
+                const proposalSubmitId = page.props.flash.proposal_submit_id;
+                Inertia.visit(route('proposal.submitted', { proposal_submit_id: proposalSubmitId }));
+            }
+        });
     };
 
     return (

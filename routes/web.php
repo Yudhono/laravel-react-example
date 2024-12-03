@@ -37,6 +37,10 @@ Route::post('/propose', [ProposalsController::class, 'storeForUser'])->name('pro
 Route::get('/proposal-status/{proposal_submit_id}', [ProposalsController::class, 'checkStatus'])->name('proposal.status');
 Route::get('/proposal-status', [ProposalsController::class, 'proposalStatusView'])->name('proposal.proposalStatusView');
 
+Route::get('/proposal-submitted/{proposal_submit_id}', function ($proposal_submit_id) {
+    return Inertia::render('ProposalSubmitted', ['proposal_submit_id' => $proposal_submit_id]);
+})->name('proposal.submitted');
+
 Route::middleware('auth')->group(function () {
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
