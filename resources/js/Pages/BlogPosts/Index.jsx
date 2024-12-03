@@ -12,6 +12,8 @@ import {
     Paper,
     Button,
     Typography,
+    TablePagination,
+    Stack,
 } from "@mui/material";
 
 const Index = ({ posts }) => {
@@ -20,6 +22,26 @@ const Index = ({ posts }) => {
             router.delete(route("blogposts.destroy", id));
         }
     };
+
+    const handleChangePage = (event, newPage) => {
+        router.get(
+            route("blogposts.index", {
+                page: newPage + 1,
+                per_page: posts.per_page,
+            })
+        );
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        router.get(
+            route("blogposts.index", {
+                page: 1,
+                per_page: parseInt(event.target.value, 10),
+            })
+        );
+    };
+
+    const displayRange = `Displaying ${posts.from} - ${posts.to} of ${posts.total}`;
 
     return (
         <DashboardTemplate>
@@ -44,7 +66,7 @@ const Index = ({ posts }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {posts.map((post) => (
+                        {posts.data.map((post) => (
                             <TableRow key={post.id}>
                                 <TableCell>
                                     <InertiaLink
@@ -75,6 +97,23 @@ const Index = ({ posts }) => {
                         ))}
                     </TableBody>
                 </Table>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                >
+                    <Typography variant="body2" sx={{ marginLeft: 2 }}>
+                        {displayRange}
+                    </Typography>
+                    <TablePagination
+                        component="div"
+                        count={posts.total}
+                        rowsPerPage={posts.per_page}
+                        page={posts.current_page - 1}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Stack>
             </TableContainer>
         </DashboardTemplate>
     );

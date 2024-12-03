@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class BlogPostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = BlogPost::all();
+        $perPage = $request->input('per_page', 10); // Default to 10 if not provided
+        $posts = BlogPost::paginate($perPage);
         return Inertia::render('BlogPosts/Index', ['posts' => $posts]);
     }
 
