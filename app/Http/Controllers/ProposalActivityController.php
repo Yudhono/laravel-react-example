@@ -9,11 +9,17 @@ use App\Models\Proposal;
 
 class ProposalActivityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $proposalActivities = ProposalActivity::with('timeSlots')->get();
+        $perPage = $request->input('perPage', 10);
+        $proposalActivities = ProposalActivity::with('timeSlots')->paginate($perPage);
+
         return Inertia::render('ProposalActivities/Index', [
-            'proposalActivities' => $proposalActivities
+            'proposalActivities' => $proposalActivities->items(),
+            'currentPage' => $proposalActivities->currentPage(),
+            'lastPage' => $proposalActivities->lastPage(),
+            'perPage' => $perPage,
+            'total' => $proposalActivities->total()
         ]);
     }
 
