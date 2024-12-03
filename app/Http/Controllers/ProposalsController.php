@@ -193,9 +193,13 @@ class ProposalsController extends Controller
 
         $validatedData = $request->validate([
             'status' => 'required|string|in:PENDING,REJECTED,APPROVED',
+            'remark' => 'required_if:status,REJECTED|string|max:255',
         ]);
 
-        $proposal->update(['status' => $validatedData['status']]);
+        $proposal->update([
+            'status' => $validatedData['status'],
+            'remark' => $validatedData['remark'] ?? null,
+        ]);
 
         if ($validatedData['status'] === 'APPROVED') {
             return Inertia::render('Proposals/Edit', ['proposal' => $proposal, 'showModal' => true]);

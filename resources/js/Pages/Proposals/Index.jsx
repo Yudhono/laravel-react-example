@@ -32,8 +32,6 @@ import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { debounce } from "lodash";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
@@ -93,6 +91,9 @@ const Index = ({
         });
     }, [currentPage, perPage, filters]);
 
+    const [showRejectionModal, setShowRejectionModal] = useState(false);
+    const [rejectionRemark, setRejectionRemark] = useState("");
+
     const handleStatusClick = (event, proposal) => {
         setAnchorEl(event.currentTarget);
         setSelectedProposal(proposal);
@@ -108,6 +109,8 @@ const Index = ({
             if (status === "APPROVED") {
                 setSelectedProposal(selectedProposal);
                 setShowModal(true);
+            } else if (status === "REJECTED") {
+                setShowRejectionModal(true);
             } else {
                 Inertia.post(
                     route("proposals.updateStatus", selectedProposal.id),
@@ -118,6 +121,20 @@ const Index = ({
             }
         }
         handleStatusClose();
+    };
+
+    const handleRejectionSubmit = () => {
+        if (!selectedProposal) {
+            console.error("No proposal selected");
+            return;
+        }
+
+        Inertia.post(route("proposals.updateStatus", selectedProposal.id), {
+            status: "REJECTED",
+            remark: rejectionRemark,
+        });
+        setShowRejectionModal(false);
+        setRejectionRemark("");
     };
 
     const handleAddActivityDate = () => {
@@ -158,12 +175,6 @@ const Index = ({
             activityData
         );
         setShowModal(false);
-    };
-
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this proposal?")) {
-            Inertia.delete(route("proposals.destroy", id));
-        }
     };
 
     const handlePageChange = (event, value) => {
@@ -586,6 +597,48 @@ const Index = ({
                         >
                             <Button
                                 onClick={handleModalSubmit}
+                                variant="contained"
+                                color="primary"
+                            >
+                                Submit
+                            </Button>
+                        </Box>
+                    </Box>
+                </Modal>
+                <Modal
+                    open={showRejectionModal}
+                    onClose={() => setShowRejectionModal(false)}
+                >
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: 400,
+                            bgcolor: "background.paper",
+                            borderRadius: 3,
+                            boxShadow: 24,
+                            p: 4,
+                        }}
+                    >
+                        <h2>Rejection Remark</h2>
+                        <TextField
+                            label="Remark"
+                            value={rejectionRemark}
+                            onChange={(e) => setRejectionRemark(e.target.value)}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                marginTop: 2,
+                            }}
+                        >
+                            <Button
+                                onClick={handleRejectionSubmit}
                                 variant="contained"
                                 color="primary"
                             >
